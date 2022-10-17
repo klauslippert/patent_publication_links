@@ -125,10 +125,10 @@ to be used inside a UNIX BASH
 ---- 
 
 
-{{< mermaid >}} 
+```mermaid
     graph TB
     A --> B
-{{< /mermaid >}}
+```
 
 
 
