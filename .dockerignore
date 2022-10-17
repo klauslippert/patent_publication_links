@@ -1,0 +1,5 @@
+data/*
+notebooks/*
+sonst/*
+figures/*
+__pycache__/*

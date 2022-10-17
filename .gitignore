@@ -1,0 +1,9 @@
+.ipynb_checkpoints
+*.kate-swp
+__pycache__
+*.xml
+data/postgresql/**
+data/patent/**
+data/publication/**
+patentfiles
+crossref_cache.sqlite
