@@ -1,11 +1,12 @@
 #!/bin/bash
 
-export myemail=lippert@zbmed.de
+
+## put in your own email here !
+export myemail=youremail@example.com
+##
+
 
 source ./db_credentials.sh
-
-
-
 
 function main {
 echo "##" `date` "start complete pipeline"
