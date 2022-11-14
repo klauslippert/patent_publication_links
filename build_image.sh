@@ -1,7 +1,10 @@
-sudo chown -R lippert:lippert data/postgresql/
-sudo chown -R lippert:lippert code/
+# adopt those 2 lines for your username
+#sudo chown -R lippert:lippert data/postgresql/
+#sudo chown -R lippert:lippert code/
+#
 
-export image=pat_pub_links:0.1
+
+export image=pat_pub_links:1.0
 export mypath=`pwd`
 echo $mypath
 
@@ -24,11 +27,3 @@ docker run -it \
 -v $mypath/code:/home/user/code \
 -p 6543:5432 \
 $image /bin/bash
-
-#-v $mypath/data/postgresql:/home/user/data/postgresql \
-#-v $mypath/data/postgresql/main:/var/lib/postgresql/10/main \
-## --user "$(id -u):$(id -g)" \
-##/var/lib/postgresql/10/main/base \
-##
-##-v $mypath/data/postgresql/base:/var/lib/postgresql/10/main/base \
-##-v $mypath/data/postgresql:/home/user/data/postgresql \
