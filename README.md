@@ -137,7 +137,13 @@ to be used inside a UNIX BASH
 
 ```mermaid
     graph TB
-    A --> B
+    EPO
+    PubMed
+    
+    
+    funct00_01
+    funct00_02
+    funct00_03
 ```
 
 
