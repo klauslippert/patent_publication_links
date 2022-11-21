@@ -55,10 +55,100 @@ to be used inside a UNIX BASH
 - **YES**, this scripts only use a static snapshoot of the data. If you want to extend this repo: there are no continious delta-load functions. Additionally, you need intermediate steps, that you e.g. don't do the long lasting processing again and again, but also handle growing patent families. This functionality will be soon implemented in the [ZB MED](https://www.zbmed.de/en) Search Portal for Live Sciences [LIVIVO](https://www.livivo.de/app?LANGUAGE=en), where you'll get the patent-publication links as additional information to the latest publication data (and not only PubMed), using the latest patent data.
 
 
+
+## Data Flow
+```mermaid
+    graph TB
+subgraph get data -> files
+    EPO-->|funct02_01|file:/data/patent
+    PubMed-->|funct01_01|file:/data/publication
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph files -> DB: stage
+    file:/data/patent-->|funct02_02...funct02_05|patent.stage
+    file:/data/publication-->|funct01_01|pubmed_baseline.stage
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph raw
+    subgraph json/xml
+        patent.stage-->|funct03_01|patent.raw
+        pubmed_baseline.stage-->|funct03_01|pubmed_baseline.raw
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    subgraph relational
+        pubmed_baseline.raw-->|funct03_02|publ.raw_pubmed_baseline
+        patent.raw-->|funct03_03|publ.raw_patente
+    end
+end    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph 1. JOIN by names
+    subgraph Process names pubmed
+    publ.raw_pubmed_baseline-->|funct04_01|publ.names_pubmed_baseline
+    publ.names_pubmed_baseline-->|funct04_02|publ.tmp_extract_country_iso
+    publ.names_pubmed_baseline-->|funct04_03|publ.names_ext_pubmed_baseline
+    publ.tmp_extract_country_iso-->|funct04_03|publ.names_ext_pubmed_baseline
+    publ.names_ext_pubmed_baseline-->|funct04_04|publ.master_pubmed_baseline
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    subgraph Process names patente
+    publ.raw_patente-->|funct05_01|publ.names_raw_patente
+    publ.names_raw_patente--->|funct05_02|publ.names_patente
+    publ.names_patente-->|funct05_03|publ.master_patente
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%
+    publ.master_pubmed_baseline-->|funct06_01|publ.join_raw
+    publ.master_patente-->|funct06_01|publ.join_raw
+    publ.join_raw-->|funct06_02|publ.dist_publication
+    publ.join_raw-->|funct06_03|publ.dist_patents
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph 2. content similarity
+    publ.raw_pubmed_baseline-->|funct07_01|publ.mesh_pubmed_baseline
+    publ.dist_publication-->publ.mesh_pubmed_baseline
+    %%%%%%%%%%%%%%%%%%%%%%%
+    publ.dist_patents-->publ.text_patente
+    publ.raw_patente-->|funct08_01|publ.text_patente
+    publ.text_patente-->|funct08_02|publ.text_patente_proc
+    publ.text_patente_proc-->|funct08_03|publ.text_patente_proc
+    publ.text_patente_proc-->|funct08_04|publ.mesh_patente
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    publ.mesh_patente-->|funt09_01|publ.embed_bert_pubmed_baseline
+    publ.mesh_pubmed_baseline-->|funt09_01|publ.embed_bert_patente
+    %%%%%%%%%%%%%%%%%%%%%%%%%
+    publ.embed_bert_pubmed_baseline-->|funct10_01|publ.join_cos_sim
+    publ.embed_bert_patente-->|funct10_01|publ.join_cos_sim
+    publ.join_raw-->publ.join_cos_sim
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+_[ ]-->|funct11_01|publ.journal_normalize
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph 3. common references
+    pubmed_baseline.stage-->|funct11_02|publ.ref_pubmed_baseline
+    publ.dist_publication-->publ.ref_pubmed_baseline
+    %%%%%%%%%%%%%%%%%%%%%%%%%%
+    publ.raw_patente-->|funct11_03|publ.ref_raw_patents
+    publ.dist_patents-->publ.ref_raw_patents
+    publ.journal_normalize-->publ.ref_raw_patents
+    publ.ref_raw_patents-->|funct11_04|publ.ref_raw_patents
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    publ.join_raw-->publ.join_common_refs
+    publ.ref_pubmed_baseline-->|funct11_05|publ.join_common_refs
+    publ.ref_raw_patents-->|funct11_05|publ.join_common_refs
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+subgraph 4. ranking
+    publ.raw_patente--->|funct12_01|publ.pat_ipc
+    publ.join_raw--->|funct12_02|publ.join_all
+    publ.join_common_refs--->|funct12_02|publ.join_all
+    publ.join_cos_sim--->|funct12_02|publ.join_all
+    publ.pat_ipc-->|funct12_02|publ.join_all
+
+    publ.join_all-->|funct12_03|publ.join_all_ranked
+end
+```
+
+
 ## File Description
-
-
-
 | |script in /home/user/code|purpose|
 |---|---|---|
 | | run.sh| main script to run the complete pipeline. Since there might be problems with the amount of data downloaded from EPO or PubMed, I recommend using the download scripts manually, comment them out in this file and run the rest automatically.|   
@@ -135,17 +225,4 @@ to be used inside a UNIX BASH
 ----
 
 
-```mermaid
-    graph TB
-    EPO
-    PubMed
-    
-    
-    funct00_01
-    funct00_02
-    funct00_03
-```
 
-
-
-## Data Flow
