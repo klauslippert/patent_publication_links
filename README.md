@@ -62,54 +62,55 @@ to be used inside a UNIX BASH
 | |script in /home/user/code|purpose|
 |---|---|---|
 | | run.sh| main script to run the complete pipeline. Since there might be problems with the amount of data downloaded from EPO or PubMed, I recommend using the download scripts manually, comment them out in this file and run the rest automatically.|   
-|   |   |   |   |
+| --- | --- | --- | --- |
 |preparation  |funct00_01_create_schemas_and_extensions.sql | creates needed schemas and extensions on the PostgresQL database  |  
 ||funct00_02_SQL_functions.sql | create db-function for finding emailendings in text |   
 ||funct00_03_upload_MeSH_mainheadings.py  | upload the MeSH terms   |  
 ||funct00_04_countrycodes_for_emailendings.py | ISO countrycodes used by country-detection via emailending  |  
 ||funct00_05_countrynames_for_keywordextraction.py | ISO countrynamens used for country-detection  |  
-| |   |  |
+| --- | --- | --- | --- |
 |get publication data|funct01_01_data_download_pubmed.py | downloads the publication data from PubMed. If you're a company. Pls check the legal rules for commercial / non-commercial use of this data yourself. better **run this manually**, because of  download limit from PubMed |   
-|   |   |   |   |
+| --- | --- | --- | --- |
 |get patent data|funct02_01_data_download_epo.py | downloads the patent data from EPO as xml; **better run this manually**, because of download limit from EPO. When you're over the download limit, EPO will give you a valid xml with no useful data inside.  |  
 ||funct02_02_create_patent_filelist.py | creates a list of all patentfiles, needed for upload to postgres  |  
 ||funct02_03_create_table_patent_stage.sql | nomen est omen  |  
 ||funct02_04_patent_xml_upload.sh | nomen est omen  |  
 ||funct02_05_parse_pat_xml.py |  helper script for funct02_04, dealing with enconding |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |create flat tables|funct03_01_create_pub_pat_raw.sql | creates postgres table for publication data  |  
 ||funct03_02_create_unnested_pubmed_baseline.sql | unnest the publication xml into flat tables  |  
 ||funct03_03_create_unnested_patente.sql |  unnest the patente xml into flat tables |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 | process publication data| funct04_01_proc_pubmed_names.sql |  process publication author names |  
 ||funct04_02_country_extract.py | extract countries from authors affiliation  |  
 ||funct04_03_normalize_pubmed_names.sql |  normalize publication author names |  
 ||funct04_04_pubmed_master.sql |   |  
+| --- | --- | --- | --- |
 |process patent data|funct05_01_patente_names.sql |   |  
 ||funct05_02_process_patent_names.py |   |  
 ||funct05_03_patent_master.sql |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |create raw publication patent pairs|funct06_01_join_patent_publication.py |   |  
 ||funct06_02_dist_publications.sql |   |  
 ||funct06_03_dist_patents.sql |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |extract MeSH from publications|funct07_01_pubmed_mesh.sql |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |extract MeSH from patents|funct08_01_patente_mesh.sql |   |  
 ||funct08_02_table_text_patente_proc.sql |   |  
 ||funct08_03_MeSH_extract.py |   |  
 ||funct08_04_patente_mainheadings.sql |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |create embeddings|funct09_01_bert_embed.py |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |calc cosine similarity|funct10_01_join_cosine_similarity.sql |   |  
-|   |   |   |
+| --- | --- | --- | --- |
 |common references|funct11_01_create_journalnorm_table.sql |   |  
 ||funct11_03_references_patents.sql |   |  
 ||funct11_02_references_publication.sql |   |  
 ||funct11_04_enrich_patents_w_crossref.py |   |  
 ||funct11_05_common_references.sql |   |  
-|   |   |   |   |
+| --- | --- | --- | --- |
 |combine and rank everything|funct12_01_patent_ipc.sql |   |  
 ||funct12_02_join_all.sql |   |  
 ||funct12_03_join_all_ranked.sql |   |  
