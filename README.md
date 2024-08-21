@@ -1,5 +1,6 @@
 ## Knowledge transfer from science to economy <br/> illustrated via patent - publication pairs: <br/> reducing ambiguities with word embeddings and references
 
+[![DOI](https://zenodo.org/badge/651529338.svg)](https://zenodo.org/doi/10.5281/zenodo.13354449)
 
 
 This is the code repository to reproduce the results and figures from [my paper](LINK MISSING).
